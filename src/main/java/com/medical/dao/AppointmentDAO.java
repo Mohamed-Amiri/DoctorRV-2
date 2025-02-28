@@ -2,12 +2,16 @@
 package com.medical.dao;
 
 import com.medical.model.Appointment;
-import com.medical.model.User;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AppointmentDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(AppointmentDAO.class.getName());
 
     public boolean createAppointment(Appointment appointment) throws SQLException {
         String query = "INSERT INTO Appointments (patient_id, doctor_id, date, time, reason, status) VALUES (?, ?, ?, ?, ?, ?)";
@@ -32,6 +36,9 @@ public class AppointmentDAO {
                     }
                 }
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error creating appointment", e);
+            throw e; // Re-throw the exception so the servlet can handle it
         }
 
         return false;
@@ -41,7 +48,7 @@ public class AppointmentDAO {
         List<Appointment> appointments = new ArrayList<>();
         String query = "SELECT a.*, " +
                 "p.username as patient_username, p.email as patient_email, p.phone as patient_phone, " +
-                "d.username as doctor_username, d.email as doctor_email " +
+                "d.username as doctor_username, d.email as doctor_email, d.phone as doctor_phone, d.role as doctor_role " +
                 "FROM Appointments a " +
                 "JOIN Users p ON a.patient_id = p.id " +
                 "JOIN Users d ON a.doctor_id = d.id " +
@@ -58,6 +65,9 @@ public class AppointmentDAO {
                     appointments.add(extractAppointmentFromResultSet(rs));
                 }
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting appointments by patient ID", e);
+            throw e;
         }
 
         return appointments;
@@ -66,8 +76,8 @@ public class AppointmentDAO {
     public List<Appointment> getAppointmentsByDoctorId(int doctorId) throws SQLException {
         List<Appointment> appointments = new ArrayList<>();
         String query = "SELECT a.*, " +
-                "p.username as patient_username, p.email as patient_email, p.phone as patient_phone, " +
-                "d.username as doctor_username, d.email as doctor_email " +
+                "p.username as patient_username, p.email as patient_email, p.phone as patient_phone, p.role as patient_role, " +
+                "d.username as doctor_username, d.email as doctor_email, d.phone as doctor_phone, d.role as doctor_role " +
                 "FROM Appointments a " +
                 "JOIN Users p ON a.patient_id = p.id " +
                 "JOIN Users d ON a.doctor_id = d.id " +
@@ -84,6 +94,9 @@ public class AppointmentDAO {
                     appointments.add(extractAppointmentFromResultSet(rs));
                 }
             }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting appointments by doctor ID", e);
+            throw e;
         }
 
         return appointments;
@@ -99,6 +112,9 @@ public class AppointmentDAO {
             stmt.setInt(2, appointmentId);
 
             return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating appointment status", e);
+            throw e;
         }
     }
 
@@ -111,6 +127,9 @@ public class AppointmentDAO {
             stmt.setInt(1, appointmentId);
 
             return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting appointment", e);
+            throw e;
         }
     }
 
@@ -130,13 +149,14 @@ public class AppointmentDAO {
         patient.setUsername(rs.getString("patient_username"));
         patient.setEmail(rs.getString("patient_email"));
         patient.setPhone(rs.getString("patient_phone"));
-        patient.setRole("PATIENT");
+        patient.setRole(rs.getString("patient_role"));
 
         User doctor = new User();
         doctor.setId(rs.getInt("doctor_id"));
         doctor.setUsername(rs.getString("doctor_username"));
         doctor.setEmail(rs.getString("doctor_email"));
-        doctor.setRole("MEDECIN");
+        doctor.setPhone(rs.getString("doctor_phone"));
+        doctor.setRole(rs.getString("doctor_role"));
 
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);

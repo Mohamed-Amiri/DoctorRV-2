@@ -26,7 +26,7 @@
         <hr class="my-4">
         <p>Connectez-vous ou inscrivez-vous pour commencer à utiliser notre service.</p>
         <a class="btn btn-primary btn-lg mr-2" href="${pageContext.request.contextPath}/login.jsp" role="button">Connexion</a>
-        <a class="btn btn-secondary btn-lg" href="${pageContext.request.contextPath}/Register.jsp" role="button">Inscription</a>
+        <a class="btn btn-secondary btn-lg" href="${pageContext.request.contextPath}/register.jsp" role="button">Inscription</a>
     </div>
 
     <div class="row">

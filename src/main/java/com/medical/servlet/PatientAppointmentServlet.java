@@ -2,9 +2,7 @@
 package com.medical.servlet;
 
 import com.medical.dao.AppointmentDAO;
-import com.medical.dao.UserDAO;
 import com.medical.model.Appointment;
-import com.medical.model.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,17 +15,26 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet("/patient/appointments")
 public class PatientAppointmentServlet extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(PatientAppointmentServlet.class.getName());
+    private static final String PATIENT_ROLE = "PATIENT";
+    private static final String APPOINTMENT_STATUS_SCHEDULED = "SCHEDULED";
+    private static final String APPOINTMENT_STATUS_CANCELLED = "CANCELLED";
+    private static final String APPOINTMENTS_JSP = "/WEB-INF/patient/appointments.jsp";
+    private static final String LOGIN_PATH = "/login";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        if (user == null || !"PATIENT".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/login");
+        if (user == null || !PATIENT_ROLE.equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + LOGIN_PATH);
             return;
         }
 
@@ -43,12 +50,12 @@ public class PatientAppointmentServlet extends HttpServlet {
             List<User> doctors = userDAO.getAllDoctors();
             request.setAttribute("doctors", doctors);
 
-            request.getRequestDispatcher("/WEB-INF/patient/appointments.jsp").forward(request, response);
+            request.getRequestDispatcher(APPOINTMENTS_JSP).forward(request, response);
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Erreur lors de la récupération des rendez-vous: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/patient/appointments.jsp").forward(request, response);
+            LOGGER.log(Level.SEVERE, "Error retrieving appointments", e);
+            request.setAttribute("error", "Erreur lors de la récupération des rendez-vous.");
+            request.getRequestDispatcher(APPOINTMENTS_JSP).forward(request, response);
         }
     }
 
@@ -57,8 +64,8 @@ public class PatientAppointmentServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        if (user == null || !"PATIENT".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/login");
+        if (user == null || !PATIENT_ROLE.equals(user.getRole())) {
+            response.sendRedirect(request.getContextPath() + LOGIN_PATH);
             return;
         }
 
@@ -83,7 +90,7 @@ public class PatientAppointmentServlet extends HttpServlet {
                     appointment.setDate(Date.valueOf(dateStr));
                     appointment.setTime(Time.valueOf(timeStr + ":00"));
                     appointment.setReason(reason);
-                    appointment.setStatus("SCHEDULED");
+                    appointment.setStatus(APPOINTMENT_STATUS_SCHEDULED);
 
                     boolean created = appointmentDAO.createAppointment(appointment);
 
@@ -101,7 +108,7 @@ public class PatientAppointmentServlet extends HttpServlet {
                 String appointmentIdParam = request.getParameter("appointmentId");
                 if (appointmentIdParam != null && !appointmentIdParam.isEmpty()) {
                     int appointmentId = Integer.parseInt(appointmentIdParam);
-                    boolean updated = appointmentDAO.updateAppointmentStatus(appointmentId, "CANCELLED");
+                    boolean updated = appointmentDAO.updateAppointmentStatus(appointmentId, APPOINTMENT_STATUS_CANCELLED);
 
                     if (updated) {
                         request.setAttribute("success", "Rendez-vous annulé avec succès!");
@@ -117,8 +124,8 @@ public class PatientAppointmentServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/patient/appointments");
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Erreur lors du traitement de la demande: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error processing request", e);
+            request.setAttribute("error", "Erreur lors du traitement de la demande.");
             doGet(request, response);
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid format for doctorId or appointmentId.");
