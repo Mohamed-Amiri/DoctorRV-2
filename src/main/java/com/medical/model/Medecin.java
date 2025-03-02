@@ -1,6 +1,7 @@
+// Medecin.java
 package com.medical.model;
 
-public class Medecin extends Users {
+public class Medecin extends User {
     private String specialite;
     private String numeroProfessionnel;
     private String disponibilite;
@@ -17,7 +18,8 @@ public class Medecin extends Users {
 
     // Constructeur minimal
     public Medecin() {
-        super("medecin");
+        super();
+        setRole("medecin");
     }
 
     // Getters et Setters

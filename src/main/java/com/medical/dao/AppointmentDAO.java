@@ -1,5 +1,6 @@
 // AppointmentDAO.java
 package com.medical.dao;
+import com.medical.model.User;
 
 import com.medical.model.Appointment;
 
@@ -47,7 +48,7 @@ public class AppointmentDAO {
     public List<Appointment> getAppointmentsByPatientId(int patientId) throws SQLException {
         List<Appointment> appointments = new ArrayList<>();
         String query = "SELECT a.*, " +
-                "p.username as patient_username, p.email as patient_email, p.phone as patient_phone, " +
+                "p.username as patient_username, p.email as patient_email, p.phone as patient_phone, p.role as patient_role, " +
                 "d.username as doctor_username, d.email as doctor_email, d.phone as doctor_phone, d.role as doctor_role " +
                 "FROM Appointments a " +
                 "JOIN Users p ON a.patient_id = p.id " +
@@ -133,6 +134,7 @@ public class AppointmentDAO {
         }
     }
 
+    // AppointmentDAO.java (Corrected section)
     private Appointment extractAppointmentFromResultSet(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setId(rs.getInt("id"));
@@ -148,19 +150,18 @@ public class AppointmentDAO {
         patient.setId(rs.getInt("patient_id"));
         patient.setUsername(rs.getString("patient_username"));
         patient.setEmail(rs.getString("patient_email"));
-        patient.setPhone(rs.getString("patient_phone"));
+        patient.setTelephone(rs.getString("patient_phone")); // Corrected method call
         patient.setRole(rs.getString("patient_role"));
 
         User doctor = new User();
         doctor.setId(rs.getInt("doctor_id"));
         doctor.setUsername(rs.getString("doctor_username"));
         doctor.setEmail(rs.getString("doctor_email"));
-        doctor.setPhone(rs.getString("doctor_phone"));
+        doctor.setTelephone(rs.getString("doctor_phone")); // Corrected method call
         doctor.setRole(rs.getString("doctor_role"));
 
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
 
         return appointment;
-    }
-}
+    }}

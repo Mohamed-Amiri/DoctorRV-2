@@ -1,12 +1,15 @@
+// User.java
 package com.medical.model;
 
-public class Users {
+public class User {
     private int id;
     private String Nom_utilisateur;
     private String Email;
     private String Mot_de_passe;
     private String Role;
-    private String Téléphone;
+    private String telephone;
+
+    public User() {}
 
     public int getId() {
         return id;
@@ -16,12 +19,12 @@ public class Users {
         this.id = id;
     }
 
-    public String getNom_utilisateur() {
-        return Nom_utilisateur;
+    public void setUsername(String username) {
+        this.Nom_utilisateur = username;
     }
 
-    public void setNom_utilisateur(String nom_utilisateur) {
-        Nom_utilisateur = nom_utilisateur;
+    public String getUsername() {
+        return Nom_utilisateur;
     }
 
     public String getEmail() {
@@ -48,23 +51,24 @@ public class Users {
         Role = role;
     }
 
-    public String getTéléphone() {
-        return Téléphone;
+    public String getTelephone() {
+        return telephone;
     }
 
-    public void setTéléphone(String téléphone) {
-        Téléphone = téléphone;
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
-    public Users(int id, String nom_utilisateur, String email, String mot_de_passe, String role, String téléphone) {
+    public User(int id, String nom_utilisateur, String email, String mot_de_passe, String role, String telephone) {
         this.id = id;
         Nom_utilisateur = nom_utilisateur;
         Email = email;
         Mot_de_passe = mot_de_passe;
         Role = role;
-        Téléphone = téléphone;
+        this.telephone = telephone;
     }
-    public Users(String role) {
+
+    public User(String role) {
         Role = role;
     }
 }

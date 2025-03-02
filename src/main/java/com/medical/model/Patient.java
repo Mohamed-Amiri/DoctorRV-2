@@ -1,6 +1,7 @@
+// Patient.java
 package com.medical.model;
 
-public class Patient extends Users {
+public class Patient extends User {
     private String numeroAssurance;
     private String groupeSanguin;
     private String antecedentsMedicaux;
@@ -17,7 +18,8 @@ public class Patient extends Users {
 
     // Constructeur minimal
     public Patient() {
-        super("patient");
+        super();
+        setRole("patient");
     }
 
     // Getters et Setters
